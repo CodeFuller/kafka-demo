@@ -57,17 +57,27 @@ namespace KafkaDemo.Producer
 
 		private static async Task ProduceMessage(IMessageProducer<DemoMessage> messageProducer, CancellationToken cancellationToken)
 		{
-			var correlationId = Guid.NewGuid();
+			var clientId1 = new Guid("7f529f88-1980-4529-ba83-e1743f426eed");
+			var clientId2 = new Guid("1157210b-e5ea-42c7-99c5-433dc0a91f73");
 
-			var message = new DemoMessage
+			for (var i = 1; !cancellationToken.IsCancellationRequested; ++i)
 			{
-				Data = "Hello, World! :)",
-				Timestamp = DateTimeOffset.Now,
-			};
+				var clientId = i % 2 == 1 ? clientId1 : clientId2;
+				var correlationId = Guid.NewGuid();
 
-			Log.Info($"Producing message with correlation id {correlationId} ...");
-			await messageProducer.ProduceMessage(message, correlationId, cancellationToken);
-			Log.Info("Message was produced successfully");
+				var message = new DemoMessage
+				{
+					ClientId = clientId,
+					Data = $"Message #{i} for client {clientId}",
+					Timestamp = DateTimeOffset.Now,
+				};
+
+				Log.Info($"Producing message with correlation id {correlationId} ...");
+				await messageProducer.ProduceMessage(message, correlationId, cancellationToken);
+				Log.Info("Message was produced successfully");
+
+				await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+			}
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace KafkaDemo.Producer
 
 				busRegistrationConfigurator.AddRider(rider =>
 				{
-					rider.AddProducer<DemoMessage>(settings.DemoProducer.TopicName);
+					rider.AddProducer<Guid, DemoMessage>(settings.DemoProducer.TopicName);
 
 					rider.UsingKafka((_, kafkaFactoryConfigurator) =>
 					{
@@ -52,7 +52,7 @@ namespace KafkaDemo.Producer
 				});
 			});
 
-			services.AddScoped<IMessageProducer<DemoMessage>, MessageProducer<DemoMessage>>();
+			services.AddScoped<IMessageProducer<DemoMessage>, DemoProducer>();
 
 			return services;
 		}
